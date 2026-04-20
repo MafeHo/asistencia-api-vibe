@@ -69,11 +69,13 @@ app.use((req, res) => {
 // Middleware de manejo de errores (debe ser el último)
 app.use(errorHandler);
 
-// Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor iniciado en puerto ${PORT}`);
-  console.log(`📝 Documentación: http://localhost:${PORT}/api`);
-  console.log(`💚 Health check: http://localhost:${PORT}/health`);
-});
+// Iniciar el servidor solo si se ejecuta directamente (no en Vercel)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor iniciado en puerto ${PORT}`);
+    console.log(`📝 Documentación: http://localhost:${PORT}/api`);
+    console.log(`💚 Health check: http://localhost:${PORT}/health`);
+  });
+}
 
 module.exports = app;
