@@ -1,0 +1,376 @@
+{
+  "documentacion": "Ejemplos de peticiones HTTP para la API de Gestión de Asistencia Estudiantil",
+  
+  "estudiantes": {
+    "POST_crear": {
+      "descripcion": "Crear un nuevo estudiante",
+      "metodo": "POST",
+      "url": "http://localhost:3000/api/estudiantes",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": "EST00003",
+        "nombre": "Pedro Rodríguez",
+        "email": "pedro.rodriguez@example.com"
+      },
+      "respuesta_exitosa": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Estudiante creado exitosamente",
+          "data": {
+            "id": "EST00003",
+            "nombre": "Pedro Rodríguez",
+            "email": "pedro.rodriguez@example.com",
+            "createdAt": "2024-04-20T10:30:00.000Z"
+          }
+        }
+      },
+      "posibles_errores": {
+        "codigo_invalido": {
+          "status": 400,
+          "body": {
+            "success": false,
+            "message": "Error de validación",
+            "errors": [
+              {
+                "field": "id",
+                "message": "El código del estudiante debe seguir el patrón EST + 5 dígitos (Ej: EST00123)"
+              }
+            ]
+          }
+        },
+        "duplicado": {
+          "status": 409,
+          "body": {
+            "success": false,
+            "code": "STUDENT_EXISTS",
+            "message": "El código del estudiante ya existe"
+          }
+        },
+        "datos_invalidos": {
+          "status": 400,
+          "body": {
+            "success": false,
+            "message": "Error de validación",
+            "errors": [
+              {
+                "field": "email",
+                "message": "El email no es válido"
+              },
+              {
+                "field": "nombre",
+                "message": "El nombre debe tener al menos 2 caracteres"
+              }
+            ]
+          }
+        }
+      }
+    },
+    
+    "GET_listar": {
+      "descripcion": "Listar todos los estudiantes",
+      "metodo": "GET",
+      "url": "http://localhost:3000/api/estudiantes",
+      "headers": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Estudiantes obtenidos exitosamente",
+          "data": [
+            {
+              "id": "EST00001",
+              "nombre": "Juan García",
+              "email": "juan.garcia@example.com",
+              "createdAt": "2024-01-15T08:00:00.000Z"
+            },
+            {
+              "id": "EST00002",
+              "nombre": "María López",
+              "email": "maria.lopez@example.com",
+              "createdAt": "2024-01-20T09:00:00.000Z"
+            }
+          ],
+          "total": 2
+        }
+      }
+    },
+    
+    "GET_porId": {
+      "descripcion": "Obtener un estudiante por ID",
+      "metodo": "GET",
+      "url": "http://localhost:3000/api/estudiantes/EST00001",
+      "headers": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Estudiante obtenido exitosamente",
+          "data": {
+            "id": "EST00001",
+            "nombre": "Juan García",
+            "email": "juan.garcia@example.com",
+            "createdAt": "2024-01-15T08:00:00.000Z"
+          }
+        }
+      },
+      "posibles_errores": {
+        "no_encontrado": {
+          "status": 404,
+          "body": {
+            "success": false,
+            "code": "STUDENT_NOT_FOUND",
+            "message": "Estudiante no encontrado"
+          }
+        }
+      }
+    }
+  },
+
+  "asistencias": {
+    "POST_registrar": {
+      "descripcion": "Registrar una nueva asistencia",
+      "metodo": "POST",
+      "url": "http://localhost:3000/api/asistencias",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id_estudiante": "EST00001",
+        "fecha": "2024-04-20",
+        "estado": "presente"
+      },
+      "notas": [
+        "La fecha debe estar en formato YYYY-MM-DD (ISO 8601)",
+        "Los estados permitidos son: 'presente', 'ausente', 'justificada'",
+        "La fecha no puede ser futura",
+        "No se puede registrar dos asistencias para el mismo estudiante en la misma fecha"
+      ],
+      "respuesta_exitosa": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "message": "Asistencia registrada exitosamente",
+          "data": {
+            "id": 4,
+            "id_estudiante": "EST00001",
+            "fecha": "2024-04-20",
+            "estado": "presente",
+            "createdAt": "2024-04-20T14:25:00.000Z"
+          }
+        }
+      },
+      "posibles_errores": {
+        "estado_invalido": {
+          "status": 400,
+          "body": {
+            "success": false,
+            "message": "Error de validación",
+            "errors": [
+              {
+                "field": "estado",
+                "message": "Los estados permitidos son: presente, ausente, justificada"
+              }
+            ]
+          }
+        },
+        "fecha_futura": {
+          "status": 400,
+          "body": {
+            "success": false,
+            "message": "Error de validación",
+            "errors": [
+              {
+                "field": "fecha",
+                "message": "La fecha no puede ser futura"
+              }
+            ]
+          }
+        },
+        "estudiante_no_existe": {
+          "status": 404,
+          "body": {
+            "success": false,
+            "code": "STUDENT_NOT_FOUND",
+            "message": "Estudiante no encontrado"
+          }
+        },
+        "registro_duplicado": {
+          "status": 409,
+          "body": {
+            "success": false,
+            "code": "DUPLICATE_ATTENDANCE",
+            "message": "Ya existe un registro de asistencia para este estudiante en esta fecha"
+          }
+        }
+      }
+    },
+
+    "POST_ejemplos_estados": [
+      {
+        "estado": "presente",
+        "descripcion": "El estudiante asistió a clase",
+        "body": {
+          "id_estudiante": "EST00001",
+          "fecha": "2024-04-18",
+          "estado": "presente"
+        }
+      },
+      {
+        "estado": "ausente",
+        "descripcion": "El estudiante no asistió a clase sin justificación",
+        "body": {
+          "id_estudiante": "EST00001",
+          "fecha": "2024-04-19",
+          "estado": "ausente"
+        }
+      },
+      {
+        "estado": "justificada",
+        "descripcion": "El estudiante no asistió pero presentó justificación",
+        "body": {
+          "id_estudiante": "EST00001",
+          "fecha": "2024-04-17",
+          "estado": "justificada"
+        }
+      }
+    ],
+
+    "GET_porEstudiante": {
+      "descripcion": "Listar todas las asistencias de un estudiante",
+      "metodo": "GET",
+      "url": "http://localhost:3000/api/asistencias/estudiante/EST00001",
+      "headers": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Asistencias obtenidas exitosamente",
+          "data": [
+            {
+              "id": 1,
+              "id_estudiante": "EST00001",
+              "fecha": "2024-04-10",
+              "estado": "presente",
+              "createdAt": "2024-04-10T08:00:00.000Z"
+            },
+            {
+              "id": 2,
+              "id_estudiante": "EST00001",
+              "fecha": "2024-04-11",
+              "estado": "ausente",
+              "createdAt": "2024-04-11T08:00:00.000Z"
+            }
+          ],
+          "total": 2,
+          "estudiante": {
+            "id": "EST00001",
+            "nombre": "Juan García"
+          }
+        }
+      },
+      "posibles_errores": {
+        "estudiante_no_existe": {
+          "status": 404,
+          "body": {
+            "success": false,
+            "code": "STUDENT_NOT_FOUND",
+            "message": "Estudiante no encontrado"
+          }
+        }
+      }
+    }
+  },
+
+  "reportes": {
+    "GET_ausentismo": {
+      "descripcion": "Obtener el Top 5 de estudiantes con más ausencias",
+      "metodo": "GET",
+      "url": "http://localhost:3000/api/reportes/ausentismo",
+      "headers": {},
+      "notas": [
+        "Se cuentan como faltas: estado 'ausente' + estado 'justificada'",
+        "Se ordena por cantidad de faltas (descendente)",
+        "Se devuelven los 5 estudiantes con mayor ausentismo",
+        "Incluye porcentaje de ausencia y desglose de presentes/ausentes/justificadas"
+      ],
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Reporte de ausentismo obtenido exitosamente",
+          "data": [
+            {
+              "ranking": 1,
+              "id": "EST00002",
+              "nombre": "María López",
+              "email": "maria.lopez@example.com",
+              "totalAsistencias": 10,
+              "presentes": 6,
+              "ausencias": 3,
+              "justificadas": 1,
+              "totalFaltas": 4,
+              "porcentajeAusencia": 40
+            },
+            {
+              "ranking": 2,
+              "id": "EST00001",
+              "nombre": "Juan García",
+              "email": "juan.garcia@example.com",
+              "totalAsistencias": 12,
+              "presentes": 10,
+              "ausencias": 1,
+              "justificadas": 1,
+              "totalFaltas": 2,
+              "porcentajeAusencia": 17
+            }
+          ],
+          "total": 2
+        }
+      },
+      "algoritmo_calculo": [
+        "1. Se cuenta el total de registros de asistencia por estudiante",
+        "2. Se categoriza cada registro por estado (presente/ausente/justificada)",
+        "3. Se calcula totalFaltas = ausencias + justificadas",
+        "4. Se calcula porcentajeAusencia = (totalFaltas / totalAsistencias) * 100",
+        "5. Se ordena DESC por totalFaltas, luego DESC por porcentajeAusencia",
+        "6. Se retorna solo el Top 5"
+      ]
+    }
+  },
+
+  "salud": {
+    "GET_health": {
+      "descripcion": "Verificar el estado del servidor",
+      "metodo": "GET",
+      "url": "http://localhost:3000/health",
+      "headers": {},
+      "respuesta_exitosa": {
+        "status": 200,
+        "body": {
+          "success": true,
+          "message": "Servidor funcionando correctamente",
+          "timestamp": "2024-04-20T14:30:00.000Z"
+        }
+      }
+    }
+  },
+
+  "curl_ejemplos": {
+    "crear_estudiante": "curl -X POST http://localhost:3000/api/estudiantes -H \"Content-Type: application/json\" -d '{\"id\": \"EST00003\", \"nombre\": \"Pedro Rodríguez\", \"email\": \"pedro@example.com\"}'",
+    
+    "listar_estudiantes": "curl http://localhost:3000/api/estudiantes",
+    
+    "obtener_estudiante": "curl http://localhost:3000/api/estudiantes/EST00001",
+    
+    "registrar_asistencia": "curl -X POST http://localhost:3000/api/asistencias -H \"Content-Type: application/json\" -d '{\"id_estudiante\": \"EST00001\", \"fecha\": \"2024-04-20\", \"estado\": \"presente\"}'",
+    
+    "asistencias_por_estudiante": "curl http://localhost:3000/api/asistencias/estudiante/EST00001",
+    
+    "reporte_ausentismo": "curl http://localhost:3000/api/reportes/ausentismo",
+    
+    "health_check": "curl http://localhost:3000/health"
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+.DS_Store
+*.log
+.env
+.vscode/
+*.swp
+*.swo
+*~
+.idea/
+dist/
+build/
